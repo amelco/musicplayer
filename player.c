@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <raylib.h>
 
 #define WINDOW_WIDTH  800
@@ -13,20 +14,13 @@
 #define BUTTON_TEXT_COLOR  DARKGRAY
 #define BUTTON_MARGIN      5
 
+// UI elements
 typedef struct
 {
     Rectangle rectangle;
     Color color;
     const char* text;
 } Button;
-
-//typedef struct
-//{
-//    Button* list;
-//    int quantity;
-//    int capacity;
-//
-//} Button_List;
 
 void draw_button(Button* botao)
 {
@@ -49,11 +43,35 @@ bool isButtonHovered(Button* botao)
     return isHovered;
 }
 
+typedef enum {
+    POPUP_DRAGDROP = 0,
+} Popup_Type;
+
+void draw_popup(Popup_Type type, char* text)
+{
+    int width = 500;
+    int height = 200;
+    int x = (WINDOW_WIDTH/2)-(width/2);
+    int y = (WINDOW_HEIGHT/2)-(height/2);
+    int textSize = MeasureText(text, BUTTON_TEXT_SIZE);
+    switch (type)
+    {
+        case POPUP_DRAGDROP:
+            DrawRectangleLinesEx((Rectangle){ x, y, width, height }, 3, DARKGRAY);
+            DrawText(text, x+x/2, y+height/3, 20, BUTTON_TEXT_COLOR);
+            DrawText("Press X to close", x+x/2, y+height/3+30, 10, BUTTON_TEXT_COLOR);
+            break;
+        default:
+            break;
+    }
+}
+
+
 int main(void)
 {
     // Inicializando
     InitAudioDevice();
-    SetMasterVolume(0.2);
+    SetMasterVolume(0.1);
     Music musica = LoadMusicStream("./music.mp3");
     PlayMusicStream(musica);
 
@@ -62,19 +80,28 @@ int main(void)
 
     // Definindo componentes gráficos da janela
     Button botao_abrir_arquivo = {{ 10, 10, 50, 20 }, BUTTON_COLOR, "Abrir arquivo"};
-    Button botao_sair= {{ 750, 560, 50, 20 }, BUTTON_COLOR, "Sair"};
+    Button botao_sair = {{ 750, 560, 50, 20 }, BUTTON_COLOR, "Sair"};
+
+    // TODO: persistir o estado da aplicação em uma estrutura
+    bool opening_file = false;
 
     // main loop
     while (!WindowShouldClose())
     {
         // ------- Atualizando -------------
-        UpdateMusicStream(musica);
+        if(IsKeyDown(KEY_Q))
+            break;
+        if (IsKeyDown(KEY_X))
+        {
+            opening_file = false;
+        }
+
         if (isButtonHovered(&botao_abrir_arquivo))
         {
             
             if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
             {
-                // TODO: abrir janela de seleção de arquivo de musica
+                opening_file = true;
             }
         }
         if (isButtonHovered(&botao_sair))
@@ -86,14 +113,20 @@ int main(void)
             }
         }
 
+        UpdateMusicStream(musica);
+
         // ------- Desenhando -------------
         BeginDrawing();
         {
             ClearBackground(BLACK);
             draw_button(&botao_abrir_arquivo);
             draw_button(&botao_sair);
-            if(IsKeyDown(KEY_Q))
-                break;
+            
+        }
+
+        if (opening_file)
+        {
+            draw_popup(POPUP_DRAGDROP, "Drag & Drop music file here");
         }
         EndDrawing();
     }
