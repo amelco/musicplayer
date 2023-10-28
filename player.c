@@ -43,47 +43,22 @@ bool isButtonHovered(Button* botao)
     return isHovered;
 }
 
-typedef enum {
-    POPUP_DRAGDROP = 0,
-} Popup_Type;
-
-void draw_popup(Popup_Type type, char* text)
-{
-    int width = 500;
-    int height = 200;
-    int x = (WINDOW_WIDTH/2)-(width/2);
-    int y = (WINDOW_HEIGHT/2)-(height/2);
-    int textSize = MeasureText(text, BUTTON_TEXT_SIZE);
-    switch (type)
-    {
-        case POPUP_DRAGDROP:
-            DrawRectangleLinesEx((Rectangle){ x, y, width, height }, 3, DARKGRAY);
-            DrawText(text, x+x/2, y+height/3, 20, BUTTON_TEXT_COLOR);
-            DrawText("Press X to close", x+x/2, y+height/3+30, 10, BUTTON_TEXT_COLOR);
-            break;
-        default:
-            break;
-    }
-}
-
 
 int main(void)
 {
     // Inicializando
     InitAudioDevice();
-    SetMasterVolume(0.1);
-    Music musica = LoadMusicStream("./music.mp3");
-    PlayMusicStream(musica);
+    SetMasterVolume(0.5);
+    Music musica = {0};
 
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE);
     SetTargetFPS(60);
 
     // Definindo componentes gráficos da janela
-    Button botao_abrir_arquivo = {{ 10, 10, 50, 20 }, BUTTON_COLOR, "Abrir arquivo"};
     Button botao_sair = {{ 750, 560, 50, 20 }, BUTTON_COLOR, "Sair"};
 
     // TODO: persistir o estado da aplicação em uma estrutura
-    bool opening_file = false;
+    char* music_file = NULL;
 
     // main loop
     while (!WindowShouldClose())
@@ -91,43 +66,45 @@ int main(void)
         // ------- Atualizando -------------
         if(IsKeyDown(KEY_Q))
             break;
-        if (IsKeyDown(KEY_X))
-        {
-            opening_file = false;
-        }
 
-        if (isButtonHovered(&botao_abrir_arquivo))
-        {
-            
-            if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
-            {
-                opening_file = true;
-            }
-        }
         if (isButtonHovered(&botao_sair))
         {
             if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
             {
-                // Sai do main loop
-                break;
+                break;  // exits main loop
             }
         }
 
-        UpdateMusicStream(musica);
+        if (!music_file && IsFileDropped())
+        {
+            FilePathList paths = LoadDroppedFiles();
+            music_file = paths.paths[0];
+            printf("File dropped: %s\n", paths.paths[0]);
+            musica = LoadMusicStream(music_file);
+            PlayMusicStream(musica);
+        }
+        if (music_file)
+        {
+            UpdateMusicStream(musica);
+        }
 
         // ------- Desenhando -------------
         BeginDrawing();
         {
             ClearBackground(BLACK);
-            draw_button(&botao_abrir_arquivo);
             draw_button(&botao_sair);
-            
+
+            if (!music_file)
+            {
+                DrawText("Drop music file here", WINDOW_WIDTH/2, WINDOW_HEIGHT/2-30, 20, BUTTON_TEXT_COLOR);
+                DrawText("Press X to close", WINDOW_WIDTH/2, WINDOW_HEIGHT/2, 10, BUTTON_TEXT_COLOR);
+            }
         }
 
-        if (opening_file)
-        {
-            draw_popup(POPUP_DRAGDROP, "Drag & Drop music file here");
-        }
+        // if (opening_file)
+        // {
+        //     draw_centered_popup(POPUP_DRAGDROP, "Drag & Drop music file here");
+        // }
         EndDrawing();
     }
 
