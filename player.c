@@ -1,5 +1,7 @@
+#include <string.h>
 #include <stdio.h>
 #include <raylib.h>
+#include <string.h>
 
 #define WINDOW_WIDTH  800
 #define WINDOW_HEIGHT 600
@@ -55,35 +57,47 @@ int main(void)
     SetTargetFPS(60);
 
     // Definindo componentes gráficos da janela
-    Button botao_sair = {{ 750, 560, 50, 20 }, BUTTON_COLOR, "Sair"};
+    Button botao_sair = {{ 750, 560, 50, 20 }, BUTTON_COLOR, "Close"};
 
     // TODO: persistir o estado da aplicação em uma estrutura
-    char* music_file = NULL;
+    char music_name[256] = {'\0'};
+    bool music_loaded = false;
+    bool music_playing = false;
 
     // main loop
     while (!WindowShouldClose())
     {
         // ------- Atualizando -------------
-        if(IsKeyDown(KEY_Q))
-            break;
-
-        if (isButtonHovered(&botao_sair))
+        if ( (isButtonHovered(&botao_sair) && IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) || IsKeyDown(KEY_Q) )
         {
-            if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
+            break;  // exits main loop
+        }
+        if (IsKeyPressed(KEY_SPACE))
+        {
+            if (music_playing)
             {
-                break;  // exits main loop
+                PauseMusicStream(musica);
+                music_playing = false;
+            }
+            else
+            {
+                ResumeMusicStream(musica);
+                music_playing = true;
             }
         }
 
-        if (!music_file && IsFileDropped())
+        if (IsFileDropped())
         {
             FilePathList paths = LoadDroppedFiles();
-            music_file = paths.paths[0];
             printf("File dropped: %s\n", paths.paths[0]);
-            musica = LoadMusicStream(music_file);
+            strcpy(music_name, GetFileName(paths.paths[0]));
+            musica = LoadMusicStream(paths.paths[0]);
+            music_loaded = true;
             PlayMusicStream(musica);
+            music_playing = true;
+            UnloadDroppedFiles(paths);
         }
-        if (music_file)
+        if (music_loaded)
         {
             UpdateMusicStream(musica);
         }
@@ -94,17 +108,15 @@ int main(void)
             ClearBackground(BLACK);
             draw_button(&botao_sair);
 
-            if (!music_file)
-            {
-                DrawText("Drop music file here", WINDOW_WIDTH/2, WINDOW_HEIGHT/2-30, 20, BUTTON_TEXT_COLOR);
-                DrawText("Press X to close", WINDOW_WIDTH/2, WINDOW_HEIGHT/2, 10, BUTTON_TEXT_COLOR);
-            }
-        }
+            DrawText("Drop music file here", 10, WINDOW_HEIGHT/2-30, 20, BUTTON_TEXT_COLOR);
+            DrawText("Press Q to close", 10, WINDOW_HEIGHT/2, 10, BUTTON_TEXT_COLOR);
 
-        // if (opening_file)
-        // {
-        //     draw_centered_popup(POPUP_DRAGDROP, "Drag & Drop music file here");
-        // }
+            if (music_loaded)
+            {
+                DrawText(music_name, 10, 10, 10, BUTTON_TEXT_COLOR);
+            }
+
+        }
         EndDrawing();
     }
 
