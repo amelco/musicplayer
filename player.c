@@ -3,6 +3,7 @@
 #include <raylib.h>
 #include <string.h>
 
+
 #define WINDOW_WIDTH  800
 #define WINDOW_HEIGHT 600
 #define WINDOW_TITLE  "Music Player"
@@ -64,6 +65,8 @@ int main(void)
     char music_name[256] = {'\0'};
     bool music_loaded = false;
     bool music_playing = false;
+    float music_volume = 1.0f;
+    int volume_counter = 0;
 
     // main loop
     while (!WindowShouldClose())
@@ -101,6 +104,19 @@ int main(void)
         if (music_loaded)
         {
             UpdateMusicStream(musica);
+
+            if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_VOLUME_UP))
+            {
+                music_volume = music_volume < 1.0 ? music_volume + 0.1 : 1.0;
+                SetMusicVolume(musica, music_volume);
+                volume_counter = 30;
+            }
+            if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_VOLUME_DOWN))
+            {
+                music_volume = music_volume > 0.0 ? music_volume - 0.1 : 0.0;
+                SetMusicVolume(musica, music_volume);
+                volume_counter = 30;
+            }
         }
 
         // ------- Desenhando -------------
@@ -110,19 +126,30 @@ int main(void)
             draw_button(&botao_sair);
 
             DrawText("Drop music file here", 10, WINDOW_HEIGHT/2-30, TEXT_SIZE, BUTTON_TEXT_COLOR);
-            if (music_loaded) DrawText("Press SPACE to play/pause", 10, WINDOW_HEIGHT/2, TEXT_SIZE/2., BUTTON_TEXT_COLOR);
+            if (music_loaded) DrawText("Press SPACE to play/pause ", 10, WINDOW_HEIGHT/2-7, TEXT_SIZE/2., BUTTON_TEXT_COLOR);
+            if (music_loaded) DrawText("Press UP/DOWN arrows for volume", 10, WINDOW_HEIGHT/2+7, TEXT_SIZE/2., BUTTON_TEXT_COLOR);
             DrawText("Press Q to close", 10, WINDOW_HEIGHT/2+20, TEXT_SIZE/2., BUTTON_TEXT_COLOR);
 
             if (music_loaded)
             {
                 // draw music length and amount played
                 DrawText(music_name, 10, 10, 10, BUTTON_TEXT_COLOR);
-                char total_time[100] = {'\0'};
+                char total_time[25] = {'\0'};
                 int music_time = GetMusicTimeLength(musica);
                 int played_time = GetMusicTimePlayed(musica);
                 sprintf(total_time, "Duration: %02d:%02d / %02d:%02d", played_time/60, played_time%60, music_time/60, music_time%60);
                 int text_size = MeasureText(total_time, TEXT_SIZE/2.);
                 DrawText(total_time, WINDOW_WIDTH/2.-text_size/2., WINDOW_HEIGHT-60, TEXT_SIZE/2., TEXT_COLOR);
+
+                // draw volume info for a fixed time after volume change
+                if (volume_counter > 0)
+                {
+                    volume_counter--;
+                    char volume_text [5] = {'\0'};
+                    sprintf(volume_text, "%02.0f %%", (music_volume * 100));
+                    int text_size = MeasureText(volume_text, TEXT_SIZE/2.);
+                    DrawText(volume_text, WINDOW_WIDTH/2.-text_size/2., WINDOW_HEIGHT/2, TEXT_SIZE/2., TEXT_COLOR);
+                }
             }
 
         }
