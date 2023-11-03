@@ -18,6 +18,7 @@ On a terminal, execute: `./player`
 - Show music duration and time played
 - Play / Pause
 - Volume control
+- Progress bar
 
 
 ![Simple C Music Player](scmp.png)
