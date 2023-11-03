@@ -100,6 +100,7 @@ int main(void)
             PlayMusicStream(musica);
             music_playing = true;
             UnloadDroppedFiles(paths);
+            SetWindowFocused();
         }
         if (music_loaded)
         {
@@ -132,15 +133,23 @@ int main(void)
 
             if (music_loaded)
             {
-                // draw music length and amount played
-                DrawText(music_name, 10, 10, 10, BUTTON_TEXT_COLOR);
-                char total_time[25] = {'\0'};
-                int music_time = GetMusicTimeLength(musica);
-                int played_time = GetMusicTimePlayed(musica);
-                sprintf(total_time, "Duration: %02d:%02d / %02d:%02d", played_time/60, played_time%60, music_time/60, music_time%60);
-                int text_size = MeasureText(total_time, TEXT_SIZE/2.);
-                DrawText(total_time, WINDOW_WIDTH/2.-text_size/2., WINDOW_HEIGHT-60, TEXT_SIZE/2., TEXT_COLOR);
+                float music_time = GetMusicTimeLength(musica);
+                float played_time = GetMusicTimePlayed(musica);
 
+                // draw music length and amount played
+                {
+                    char total_time[15] = {'\0'};
+                    sprintf(total_time, "%02d:%02d / %02d:%02d", (int)played_time/60, (int)played_time%60, (int)music_time/60, (int)music_time%60);
+                    DrawText(total_time, 10, 15, TEXT_SIZE/2., TEXT_COLOR);
+                }
+                // draw music length/played bar with music name
+                {
+                    float percentage = played_time/music_time;
+                    DrawRectangleRec((Rectangle){ 0, 0, WINDOW_WIDTH*percentage, 13}, DARKBLUE);
+                    int text_size = MeasureText(music_name, TEXT_SIZE/2.);
+                    // DrawText(music_name, WINDOW_WIDTH/2.-text_size/2., 10, 5, WHITE);
+                    DrawText(music_name, 10, 2, 5, WHITE);
+                }
                 // draw volume info for a fixed time after volume change
                 if (volume_counter > 0)
                 {
@@ -155,7 +164,7 @@ int main(void)
         }
         EndDrawing();
     }
-
+    UnloadMusicStream(musica);
     CloseWindow();
     CloseAudioDevice();
 

@@ -5,4 +5,5 @@ set -xe
 CFLAGS="-Wall -Wextra -ggdb -lraylib"
 LIBS="-L/usr/local/lib"
 
-clang $CFLAGS -o player player.c $LIBS
+mkdir -p build
+clang $CFLAGS -o build/player player.c $LIBS
