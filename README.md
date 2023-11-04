@@ -19,7 +19,7 @@ On a terminal, execute: `./player`
 - Play / Pause
 - Volume control
 - Progress bar
-- Hot reload graphical enviroment (for development mode)
+- Hot reload graphical enviroment (for development mode) in progress
 
 
 ![Simple C Music Player](scmp.png)
