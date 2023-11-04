@@ -1,3 +1,5 @@
-player
+build/
+build/player
+build/*.exe
 *.exe
 *.mp3
