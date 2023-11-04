@@ -2,24 +2,9 @@
 #include <stdio.h>
 #include <raylib.h>
 #include <string.h>
-
 #include <dlfcn.h>
 
 #include "plug.h"
-
-#define WINDOW_WIDTH  800
-#define WINDOW_HEIGHT 600
-#define WINDOW_TITLE  "Music Player"
-
-#define BACKGROUND_COLOR   BLACK
-#define TEXT_COLOR         GRAY
-#define TEXT_SIZE          20.0
-
-#define BUTTON_COLOR       GRAY
-#define BUTTON_HOVER_COLOR LIGHTGRAY
-#define BUTTON_TEXT_SIZE   10.0
-#define BUTTON_TEXT_COLOR  DARKGRAY
-#define BUTTON_MARGIN      5
 
 // for now, they are globals
 void *handle;

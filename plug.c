@@ -3,21 +3,6 @@
 #include <string.h>
 #include "plug.h"
 
-#define WINDOW_WIDTH  800
-#define WINDOW_HEIGHT 600
-#define WINDOW_TITLE  "Music Player"
-
-#define BACKGROUND_COLOR   BLACK
-#define TEXT_COLOR         GRAY
-#define TEXT_SIZE          20.0
-
-#define BUTTON_COLOR       GRAY
-#define BUTTON_HOVER_COLOR LIGHTGRAY
-#define BUTTON_TEXT_SIZE   10.0
-#define BUTTON_TEXT_COLOR  DARKGRAY
-#define BUTTON_MARGIN      5
-
-
 void plug_init(Plug *plug)
 {
     memset(plug->music_name, '\0', 256);
@@ -27,34 +12,35 @@ void plug_init(Plug *plug)
     plug->volume_counter = 0;
 }
 
+// Disabling drawing of buttons for now
 // UI elements
-typedef struct
-{
-    Rectangle rectangle;
-    Color color;
-    const char* text;
-} Button;
+// typedef struct
+// {
+//     Rectangle rectangle;
+//     Color color;
+//     const char* text;
+// } Button;
 
-void draw_button(Button* botao)
-{
-    int textSize = MeasureText(botao->text, BUTTON_TEXT_SIZE);
-    botao->rectangle.width = textSize + 2*BUTTON_MARGIN;
-    botao->rectangle.height = BUTTON_TEXT_SIZE + 2*BUTTON_MARGIN;
-    DrawRectangleRec(botao->rectangle, botao->color);
-    DrawText(botao->text, botao->rectangle.x+BUTTON_MARGIN, botao->rectangle.y+BUTTON_MARGIN, BUTTON_TEXT_SIZE, BUTTON_TEXT_COLOR);
-}
+// void draw_button(Button* botao)
+// {
+//     int textSize = MeasureText(botao->text, BUTTON_TEXT_SIZE);
+//     botao->rectangle.width = textSize + 2*BUTTON_MARGIN;
+//     botao->rectangle.height = BUTTON_TEXT_SIZE + 2*BUTTON_MARGIN;
+//     DrawRectangleRec(botao->rectangle, botao->color);
+//     DrawText(botao->text, botao->rectangle.x+BUTTON_MARGIN, botao->rectangle.y+BUTTON_MARGIN, BUTTON_TEXT_SIZE, BUTTON_TEXT_COLOR);
+// }
 
-bool isButtonHovered(Button* botao)
-{
-    botao->color = BUTTON_COLOR;
-    Vector2 mouse_pos = GetMousePosition();
-    bool isHovered = CheckCollisionPointRec(mouse_pos, botao->rectangle);
-    if(isHovered)
-    {
-        botao->color = BUTTON_HOVER_COLOR;
-    }
-    return isHovered;
-}
+// bool isButtonHovered(Button* botao)
+// {
+//     botao->color = BUTTON_COLOR;
+//     Vector2 mouse_pos = GetMousePosition();
+//     bool isHovered = CheckCollisionPointRec(mouse_pos, botao->rectangle);
+//     if(isHovered)
+//     {
+//         botao->color = BUTTON_HOVER_COLOR;
+//     }
+//     return isHovered;
+// }
 
 void plug_hello(void)
 {
