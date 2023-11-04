@@ -11,7 +11,7 @@ I'm designing all graphical elements from the ground up, utilizing raylib's simp
 On a terminal, execute: `./build.sh`
 
 ### How to run
-On a terminal, execute: `./player`
+On a terminal, execute: `./build/player`
 
 ## (Simple) Features
 - Drag & Drop to load music files
