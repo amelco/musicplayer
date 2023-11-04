@@ -20,6 +20,7 @@ On a terminal, execute: `./player`
 - Volume control
 - Progress bar
 - Hot reload graphical enviroment (for development mode) in progress
+  - Feature heavily inspired by this [fantastic tsoding video](https://youtu.be/Y57ruDOwH1g?si=j-1m7rwtaBbxW80x)
 
 
 ![Simple C Music Player](scmp.png)
