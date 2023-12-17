@@ -44,13 +44,43 @@ bool load_plug()
     return true;
 }
 
-int main(void)
+void show_usage(char* programName)
 {
+    printf("Usage:\n\t%s [musicFileName]\n", programName);
+}
+
+void load_music(char* file_path, Plug* plug)
+{
+    strcpy(plug->music_name, GetFileName(file_path));
+    plug->musica = LoadMusicStream(file_path);
+    plug->music_loaded = true;
+    PlayMusicStream(plug->musica);
+    plug->music_playing = true;
+}
+
+int main(int argc, char** argv)
+{
+    bool hasInputFile = false;
+    char musicFilePath[256] = {'\0'};
+
+    if (argc > 2)
+    {
+        printf("ERROR: Incorrect number of arguments\n");
+        show_usage(argv[0]);
+        return 1;
+    }
+    if (argc == 2)
+    {
+        printf("%s\n", argv[1]);
+        strcpy(musicFilePath, argv[1]);
+        hasInputFile = true;
+    }
+
     load_plug();
     plug_init(&plug);
 
     InitAudioDevice();
-    SetMasterVolume(0.5);
+    SetMasterVolume(1.0);
 
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE);
     SetTargetFPS(60);
@@ -80,15 +110,12 @@ int main(void)
         if (IsFileDropped())
         {
             FilePathList paths = LoadDroppedFiles();
-            // printf("File dropped: %s\n", paths.paths[0]);
-            strcpy(plug.music_name, GetFileName(paths.paths[0]));
-            plug.musica = LoadMusicStream(paths.paths[0]);
-            plug.music_loaded = true;
-            PlayMusicStream(plug.musica);
-            plug.music_playing = true;
+            load_music(paths.paths[0], &plug);
             UnloadDroppedFiles(paths);
             SetWindowFocused();
         }
+        if (hasInputFile && !plug.music_loaded) load_music(musicFilePath, &plug);
+
         if (plug.music_loaded)
         {
             UpdateMusicStream(plug.musica);
